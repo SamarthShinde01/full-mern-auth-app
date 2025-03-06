@@ -1,5 +1,5 @@
-import resend from "../config/resend";
-import { EMAIL_SENDER, NODE_ENV } from "../utils/constants";
+import { Resend } from "resend";
+import { EMAIL_SENDER, NODE_ENV, RESEND_API_KEY } from "../utils/constants";
 
 type Params = {
 	to: string;
@@ -7,6 +7,8 @@ type Params = {
 	text: string;
 	html: string;
 };
+
+const resend = new Resend(RESEND_API_KEY);
 
 const getFromEmail = () =>
 	NODE_ENV === "development" ? "onboarding@resend.dev" : EMAIL_SENDER;
