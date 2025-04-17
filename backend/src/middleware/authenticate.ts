@@ -1,29 +1,26 @@
-import { RequestHandler } from "express";
-import appAssert from "../utils/appAssert";
+import { NextFunction, Request, Response } from "express";
 import { verifyToken } from "../utils/jwt";
-import { AppErrorCode, UNAUTHORIZED } from "../utils/constants";
 
-// wrap with catchErrors() if you need this to be async
-const authenticate: RequestHandler = (req, res, next) => {
-	const accessToken = req.cookies.accessToken as string | undefined;
-	appAssert(
-		accessToken,
-		UNAUTHORIZED,
-		"Not authorized",
-		AppErrorCode.InvalidAccessToken
-	);
+const authenticate = (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const accessToken = req.cookies.accessToken as string | undefined;
 
-	const { error, payload } = verifyToken(accessToken);
-	appAssert(
-		payload,
-		UNAUTHORIZED,
-		error === "jwt expired" ? "Token expired" : "Invalid token",
-		AppErrorCode.InvalidAccessToken
-	);
+		if (!accessToken) {
+			return res.status(401).json({ message: "Not authorized" });
+		}
 
-	req.userId = payload.userId;
-	req.sessionId = payload.sessionId;
-	next();
+		const { payload } = verifyToken(accessToken);
+
+		if (!payload) {
+			return res.status(401).json({ message: "Invalid token" });
+		}
+
+		req.userId = payload.userId;
+		req.sessionId = payload.sessionId;
+		next();
+	} catch (error) {
+		return res.status(404).json({ error });
+	}
 };
 
 export default authenticate;

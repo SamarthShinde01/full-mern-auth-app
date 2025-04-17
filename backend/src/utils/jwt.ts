@@ -1,6 +1,4 @@
 import jwt, { VerifyOptions, SignOptions } from "jsonwebtoken";
-import { Audience } from "../utils/constants";
-import { JWT_REFRESH_SECRET, JWT_SECRET } from "../utils/constants";
 import { UserDocument } from "../models/user.model";
 import { SessionDocument } from "../models/session.model";
 
@@ -18,17 +16,17 @@ type SignOptionsAndSecret = SignOptions & {
 };
 
 const defaults: SignOptions = {
-	audience: [Audience.User],
+	audience: ["User"],
 };
 
 const accessTokenSignOptions: SignOptionsAndSecret = {
 	expiresIn: "15m",
-	secret: JWT_SECRET,
+	secret: process.env.JWT_SECRET || "",
 };
 
 export const refreshTokenSignOptions: SignOptionsAndSecret = {
 	expiresIn: "30d",
-	secret: JWT_REFRESH_SECRET,
+	secret: process.env.JWT_REFRESH_SECRET || "",
 };
 
 export const signToken = (
@@ -48,7 +46,8 @@ export const verifyToken = <TPayload extends object = AccessTokenPayload>(
 		secret?: string;
 	}
 ) => {
-	const { secret = JWT_SECRET, ...verifyOpts } = options || {};
+	const { secret = process.env.JWT_SECRET || "", ...verifyOpts } =
+		options || {};
 	try {
 		const payload = jwt.verify(token, secret, {
 			...defaults,

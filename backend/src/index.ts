@@ -8,16 +8,16 @@ import authenticate from "./middleware/authenticate";
 import authRoutes from "./routes/auth.route";
 import userRoutes from "./routes/user.route";
 import sessionRoutes from "./routes/session.route";
-import { APP_ORIGIN, NODE_ENV, PORT } from "./utils/constants";
 
 const app = express();
+const PORT = process.env.PORT;
 
 // add middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
 	cors({
-		origin: APP_ORIGIN,
+		origin: process.env.APP_ORIGIN,
 		credentials: true,
 	})
 );
@@ -41,6 +41,6 @@ app.use("/sessions", authenticate, sessionRoutes);
 app.use(errorHandler);
 
 app.listen(PORT, async () => {
-	console.log(`Server listening on port ${PORT} in ${NODE_ENV} environment`);
+	console.log(`Server listening on port ${PORT}`);
 	await connectToDatabase();
 });

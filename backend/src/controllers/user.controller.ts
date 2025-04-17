@@ -1,10 +1,15 @@
-import { NOT_FOUND, OK } from "../utils/constants";
+import { Request, Response } from "express";
 import UserModel from "../models/user.model";
-import appAssert from "../utils/appAssert";
-import { catchErrors } from "../utils/errors";
 
-export const getUserHandler = catchErrors(async (req, res) => {
-	const user = await UserModel.findById(req.userId);
-	appAssert(user, NOT_FOUND, "User not found");
-	return res.status(OK).json(user.omitPassword());
-});
+export const getUserHandler = async (req: Request, res: Response) => {
+	try {
+		const user = await UserModel.findById(req.userId);
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		return res.status(200).json(user.omitPassword());
+	} catch (error) {
+		return res.status(404).json({ error });
+	}
+};

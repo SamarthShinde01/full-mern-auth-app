@@ -1,7 +1,5 @@
 import { Response, ErrorRequestHandler } from "express";
 import { z } from "zod";
-import { AppError } from "../utils/errors";
-import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from "../utils/constants";
 import { REFRESH_PATH, clearAuthCookies } from "../utils/cookies";
 
 const handleZodError = (res: Response, error: z.ZodError) => {
@@ -10,13 +8,13 @@ const handleZodError = (res: Response, error: z.ZodError) => {
 		message: err.message,
 	}));
 
-	return res.status(BAD_REQUEST).json({
+	return res.status(400).json({
 		errors,
 		message: error.message,
 	});
 };
 
-const handleAppError = (res: Response, error: AppError) => {
+const handleAppError = (res: Response, error: any) => {
 	return res.status(error.statusCode).json({
 		message: error.message,
 		errorCode: error.errorCode,
@@ -34,11 +32,11 @@ const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
 		return handleZodError(res, error);
 	}
 
-	if (error instanceof AppError) {
+	if (error instanceof Error) {
 		return handleAppError(res, error);
 	}
 
-	return res.status(INTERNAL_SERVER_ERROR).send("Internal server error");
+	return res.status(500).send("Internal server error");
 };
 
 export default errorHandler;
