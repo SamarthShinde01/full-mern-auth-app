@@ -1,18 +1,23 @@
-import { NextFunction, Request, Response } from "express";
+import { RequestHandler } from "express";
 import { verifyToken } from "../utils/jwt";
+import { InvalidAccessToken, UNAUTHORIZED } from "../utils/constants";
 
-const authenticate = (req: Request, res: Response, next: NextFunction) => {
+const authenticate: RequestHandler = (req, res, next) => {
 	try {
 		const accessToken = req.cookies.accessToken as string | undefined;
 
 		if (!accessToken) {
-			return res.status(401).json({ message: "Not authorized" });
+			return res
+				.status(UNAUTHORIZED)
+				.json({ message: "Not authorized", errorCode: InvalidAccessToken });
 		}
 
 		const { payload } = verifyToken(accessToken);
 
 		if (!payload) {
-			return res.status(401).json({ message: "Invalid token" });
+			return res
+				.status(UNAUTHORIZED)
+				.json({ message: "Invalid token", errorCode: InvalidAccessToken });
 		}
 
 		req.userId = payload.userId;

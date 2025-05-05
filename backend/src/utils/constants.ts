@@ -4,6 +4,9 @@ export const enum VerificationCodeType {
 	PasswordReset = "password_reset",
 }
 
+export const UNAUTHORIZED = 401;
+export const InvalidAccessToken = "InvalidAccessToken";
+
 //date functions
 export const fiveMinutesAgo = () => new Date(Date.now() - 5 * 60 * 1000);
 

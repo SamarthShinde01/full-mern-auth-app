@@ -48,6 +48,7 @@ export const verifyToken = <TPayload extends object = AccessTokenPayload>(
 ) => {
 	const { secret = process.env.JWT_SECRET || "", ...verifyOpts } =
 		options || {};
+
 	try {
 		const payload = jwt.verify(token, secret, {
 			...defaults,
